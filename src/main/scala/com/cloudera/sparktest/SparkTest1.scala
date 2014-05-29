@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package com.cloudera.sparktest1
+package com.cloudera.sparktest
 
 import org.apache.spark.SparkContext
 import org.apache.spark.SparkContext._

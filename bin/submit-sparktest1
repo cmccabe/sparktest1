@@ -7,4 +7,4 @@ export MYDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
     --master yarn-cluster \
     --num-executors 1 \
     ${MYDIR}/../target/sparktest1-1.0-SNAPSHOT.jar \
-    10
+    ${@}

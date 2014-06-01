@@ -1,0 +1,10 @@
+#!/bin/bash -x
+
+export MYDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+./bin/spark-submit \
+    --class com.cloudera.sparktest.NonExistent \
+    --master yarn-cluster \
+    --num-executors 1 \
+    ${MYDIR}/../target/sparktest1-1.0-SNAPSHOT.jar \
+    ${@}

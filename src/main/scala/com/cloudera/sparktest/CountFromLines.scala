@@ -32,14 +32,19 @@ object CountFromLines {
     val sc = new SparkContext(new SparkConf().setAppName("CountFromLines"))
     val files = sc.textFile(args(0))
     // print out all files
-    val fromLines = files.flatMap { f => 
-      val FromLine = """From: (.*)""".r
-
-      f match {
-        case FromLine(addr) => addr
-        case _ => None
+    val fromLines = files.map { file => 
+      val fs = FileSystem.get(new URI(file), SparkHadoopUtil.get.newConfiguration())
+      val stream = fs.open(new Path(file))
+      val source = scala.io.Source.createBufferedSource(stream)
+      source.getLines.foreach { line =>
+        val FromLine = """From: (.*)""".r
+        line match {
+          case FromLine(addr) => addr
+          case _ => None
+        }
       }
     }
-    fromLines.foreach(fromLine => System.out.println("CFLv2: " + fromLine))
+    System.out.println(fromLines.count())
+    //fromLines.foreach(fromLine => System.out.println("CFLv2: " + fromLine))
   }
 }

@@ -43,6 +43,8 @@ object CountFromLines {
   def main(args: Array[String]) {
     val sc = new SparkContext(new SparkConf().setAppName("CountFromLines"))
     val files = sc.textFile(args(0))
+    val fromStr  = """From: (.*)""" 
+    val broadcastVar = sc.broadcast(fromStr) //Array(1, 2, 3))
     // print out all files
     val fromLines = files.map { file => 
       val fs = FileSystem.get(new URI(file), SparkHadoopUtil.get.newConfiguration())
@@ -50,7 +52,7 @@ object CountFromLines {
       try {
         val source = scala.io.Source.createBufferedSource(stream)(getCodec)
         source.getLines.foreach { line =>
-          val FromLine = """From: (.*)""".r
+          val FromLine = broadcastVar.value.r
           line match {
             case FromLine(addr) => addr
             case _ => None
@@ -60,6 +62,7 @@ object CountFromLines {
         stream.close
       }
     }
+    val debugString = fromLines.toDebugString
     val count = fromLines.count()
     val curMonoTime = System.nanoTime
     val outFile = s"/user/cmccabe/runs/CountFromLines.run.$curMonoTime"
@@ -70,7 +73,7 @@ object CountFromLines {
     val printStream = new PrintStream(bufferedStream)
     try {
       printStream.println("CountFromLines.scala finished " +
-          s"successfully with count = $count")
+          s"successfully with count = $count, debugString =\n$debugString")
     } finally {
       printStream.close
     }
